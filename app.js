@@ -71,7 +71,12 @@ const budgetController = (function() {
             //calculate budget: income minus expenses
             data.budget = data.totals.inc - data.totals.exp;
             //calculate % of income spent
-            data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+            //make sure we don't get 'infinity' where you divide by 0
+            if (data.totals.inc > 0) {
+                data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+            } else {
+                data.percentage = -1;
+            }
         },
 
         getBudget: function() {
@@ -103,7 +108,11 @@ const uiController = (function() {
         inputValue: '.add__value',
         inputBtn: '.add__btn',
         incomeContainer: '.income__list',
-        expenseContainer: '.expenses__list'
+        expenseContainer: '.expenses__list',
+        budgetValueLabel: '.budget__value',
+        budgetIncomeLabel: '.budget__income--value',
+        budgetExpensesLabel: '.budget__expenses--value',
+        percentage: '.budget__expenses--percentage'
     }
 
     return {
@@ -164,6 +173,20 @@ const uiController = (function() {
             });
             fieldsArray[0].focus();
         },
+        
+        displayBudget: function (obj) {
+            //these come from the getBudget method
+            document.querySelector(DOMstrings.budgetIncomeLabel).textContent = obj.totalInc;
+            document.querySelector(DOMstrings.budgetExpensesLabel).textContent = obj.totalExp;
+            document.querySelector(DOMstrings.budgetValueLabel).textContent = obj.budget;
+            if (obj.percentage > 0) {
+                document.querySelector(DOMstrings.percentage).textContent = obj.percentage + "%";
+            } else {
+                document.querySelector(DOMstrings.percentage).textContent = "---";
+            }
+            
+                        
+        },
 
         getDOMstrings: function() {
             return DOMstrings
@@ -193,7 +216,7 @@ const appController = (function(budgetCtrl, uiCtrl) {
         //2. Return budget
         let budget = budgetCtrl.getBudget();
         //3. display budget on UI
-        console.log(budget);
+        uiCtrl.displayBudget(budget);
     }
 
     const ctrlAddItem = function() {
@@ -224,6 +247,12 @@ const appController = (function(budgetCtrl, uiCtrl) {
         init: function() {
             console.log('Application started');
             setupEventListeners();
+            uiCtrl.displayBudget({
+                totalInc: 0,
+                totalExp: 0,
+                budget: 0,
+                percentage: 0
+            });
         }
     }
 
