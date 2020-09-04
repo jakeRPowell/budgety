@@ -1,5 +1,6 @@
-
-//Budget Controller
+//////////////////////////////////////////////////////////////////////
+// Budget Controller
+//////////////////////////////////////////////////////////////////////
 const budgetController = (function() {
     
     //function constructors allow you to create lots of objects
@@ -15,6 +16,14 @@ const budgetController = (function() {
         this.value = value;
     };
 
+    let calculateTotal = function(type) {
+        let sum = 0;
+        data.allItems[type].forEach(function(el) {
+            sum += el.value;
+        })
+        data.totals[type] = sum;
+    };
+
     let data = {
         allItems: {
             exp: [],
@@ -23,7 +32,10 @@ const budgetController = (function() {
         totals: {
             exp: 0,
             inc: 0
-        }
+        },
+        budget: 0,
+        //we use -1 to say something is non-existent, a falsy value
+        percentage: -1
     };
 
 
@@ -51,6 +63,26 @@ const budgetController = (function() {
             //return the new element
             return newItem;
         },
+
+        calculateBudget: function() {
+            //calculate total income and expenses
+            calculateTotal('inc');
+            calculateTotal('exp');
+            //calculate budget: income minus expenses
+            data.budget = data.totals.inc - data.totals.exp;
+            //calculate % of income spent
+            data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+        },
+
+        getBudget: function() {
+          return {
+              totalInc: data.totals.inc,
+              totalExp: data.totals.exp,
+              budget: data.budget,
+              percentage: data.percentage
+          }
+        },
+
         testing: function() {
             console.log(data)
         }
@@ -59,7 +91,10 @@ const budgetController = (function() {
 
 })();
 
+//////////////////////////////////////////////////////////////////////
 //UI Controller
+//////////////////////////////////////////////////////////////////////
+
 const uiController = (function() {
 
     let DOMstrings = {
@@ -136,8 +171,10 @@ const uiController = (function() {
     }
 })()
 
+//////////////////////////////////////////////////////////////////////
 //App Controller
 //delegates tasks to the other controllers
+//////////////////////////////////////////////////////////////////////
 const appController = (function(budgetCtrl, uiCtrl) {
 
     const setupEventListeners = function() {
@@ -152,10 +189,11 @@ const appController = (function(budgetCtrl, uiCtrl) {
 
     const updateBudget = function() {
         //1. calculate budget
-
+        budgetCtrl.calculateBudget();
         //2. Return budget
-
+        let budget = budgetCtrl.getBudget();
         //3. display budget on UI
+        console.log(budget);
     }
 
     const ctrlAddItem = function() {
