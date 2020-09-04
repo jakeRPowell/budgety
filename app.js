@@ -118,6 +118,17 @@ const uiController = (function() {
             //insert HTML into DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
         },
+        
+        resetFields: function() {
+            let fields, fieldsArray;
+            fields = document.querySelectorAll(DOMstrings.inputDescription + ', ' + DOMstrings.inputValue);
+            fieldsArray = Array.prototype.slice.call(fields);
+            //in this callback function, you can access current value, index and the entire array (here field is current element)
+            fieldsArray.forEach(function(field) {
+                field.value = "";
+            });
+            fieldsArray[0].focus();
+        },
 
         getDOMstrings: function() {
             return DOMstrings
@@ -153,6 +164,9 @@ const appController = (function(budgetCtrl, uiCtrl) {
         
         //3. Add the new item to UI
         uiCtrl.addListItem(newItem, input.type);
+        
+        //clear fields
+        uiCtrl.resetFields();
 
         //4. calculate budget
         //5. display budget on UI
