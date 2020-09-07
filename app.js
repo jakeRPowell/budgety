@@ -64,6 +64,19 @@ const budgetController = (function() {
             return newItem;
         },
 
+        deleteDataItem: function(type, ID) {
+            //create a copy of desired array
+            let newArray = [...data.allItems[type]];
+            //map all items, return IDs
+            let ids = newArray.map(el => {return el.id});
+            //using new ids array, find the index of item ID (so no matter where it is we find the index)
+            let index = ids.indexOf(ID);
+            //splice new array using this index variable
+            newArray.splice(index, 1);
+            //push new data to data structure
+            data.allItems[type] = newArray;
+        },
+
         calculateBudget: function() {
             //calculate total income and expenses
             calculateTotal('inc');
@@ -161,6 +174,7 @@ const uiController = (function() {
             newHTML = html.replace('%ID%', obj.id);
             newHTML = newHTML.replace('%DESCRIPTION%', obj.description);
             newHTML = newHTML.replace('%VALUE%', obj.value);
+
             //insert HTML into DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHTML);
         },
@@ -185,9 +199,13 @@ const uiController = (function() {
                 document.querySelector(DOMstrings.percentage).textContent = obj.percentage + "%";
             } else {
                 document.querySelector(DOMstrings.percentage).textContent = "---";
-            }
-            
-                        
+            }    
+        },
+
+        deleteUIItem: function(itemID) {
+            console.log(itemID);
+            let target = document.getElementById(itemID);
+            target.parentNode.removeChild(target);
         },
 
         getDOMstrings: function() {
@@ -246,7 +264,7 @@ const appController = (function(budgetCtrl, uiCtrl) {
     }
 
     const ctrlDeleteItem = function(event) {
-        let itemID, splitId,type,ID;
+        let itemID,splitId,type,ID;
 
         itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
 
@@ -256,10 +274,11 @@ const appController = (function(budgetCtrl, uiCtrl) {
             ID = splitId[1];
 
             //delete item from data structure
-            
+            budgetCtrl.deleteDataItem(type, ID);
             //delete item from ui
-
+            uiCtrl.deleteUIItem(itemID);
             //update and show new budget
+            updateBudget();
         }
         
     }
