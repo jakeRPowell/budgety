@@ -2,4 +2,4 @@
 
 Budget app in vanilla JS
 
-[Check it out on Netlify](https://csb-yu79t.netlify.app/)
+[Check it out on Netlify](https://csb-vd854.netlify.app/)
